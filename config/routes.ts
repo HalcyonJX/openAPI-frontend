@@ -22,39 +22,46 @@ export default [
       },
     ],
   },
-  {
-    path: '/welcome',
-    name: 'welcome',
-    icon: 'smile',
-    component: './Welcome',
-  },
+  // {
+  //   path: '/welcome',
+  //   name: 'welcome',
+  //   icon: 'smile',
+  //   component: './Welcome',
+  // },
   {
     path: '/admin',
-    name: 'admin',
+    name: '管理页',
     icon: 'crown',
+    //权限控制可以去看 and design pro 的官方文档，不用纠结为什么这么写，就是人家设定的规则而已
     access: 'canAdmin',
     routes: [
       {
-        path: '/admin',
-        redirect: '/admin/sub-page',
-      },
-      {
-        path: '/admin/sub-page',
-        name: 'sub-page',
-        component: './Admin',
-      },
+        name: '接口管理',
+        icon:'table',
+        path: '/admin/interface_info',
+        component: './InterfaceInfo'
+      }
+      // {
+      //   path: '/admin',
+      //   redirect: '/admin/sub-page',
+      // },
+      // {
+      //   path: '/admin/sub-page',
+      //   name: 'sub-page',
+      //   component: './Admin',
+      // },
     ],
   },
-  {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
-  },
-  {
-    path: '/',
-    redirect: '/welcome',
-  },
+  // {
+  //   name: 'list.table-list',
+  //   icon: 'table',
+  //   path: '/list',
+  //   component: './InterfaceInfo',
+  // },
+  // {
+  //   path: '/',
+  //   redirect: '/welcome',
+  // },
   {
     path: '*',
     layout: false,

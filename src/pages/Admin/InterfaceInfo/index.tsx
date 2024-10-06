@@ -12,12 +12,16 @@ import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import {
-  addInterfacesInfoUsingPost, deleteInterfacesInfoUsingPost,
-  listInterfacesInfoByPageUsingPost, updateInterfacesInfoUsingPost
+  addInterfacesInfoUsingPost,
+  deleteInterfacesInfoUsingPost,
+  listInterfacesInfoByPageUsingPost,
+  offlineInterfaceInfoUsingPost,
+  onlineInterfaceInfoUsingPost,
+  updateInterfacesInfoUsingPost
 } from "@/services/openAPI-Platform/interfacesInfoController";
-import CreateModal from "@/pages/InterfaceInfo/components/CreateModal";
+import CreateModal from "@/pages/Admin/InterfaceInfo/components/CreateModal";
 import {SortOrder} from "antd/es/table/interface";
-import UpdateModal from "@/pages/InterfaceInfo/components/UpdateModal";
+import UpdateModal from "@/pages/Admin/InterfaceInfo/components/UpdateModal";
 const TableList: React.FC = () => {
   /**
    * @en-US Pop-up window of new window
@@ -85,6 +89,64 @@ const TableList: React.FC = () => {
     } catch (error) {
       hide();
       message.error('操作失败!' + error.message);
+      return false;
+    }
+  };
+  /**
+   *  发布接口
+   *
+   * @param selectedRows
+   */
+  const handleInterfaceOnline = async (record: API.InterfacesInfo) => {
+    // 设置加载中的提示为'正在删除'
+    const hide = message.loading('发布中...');
+    if (!record) return true; //如果接口数据为空，直接返回true
+    try {
+      // 修改为调用发布接口的Post请求方法
+      await onlineInterfaceInfoUsingPost({
+        // 传递接口的 id 参数
+        id: record.id
+      });
+      hide();
+      // 显示操作成功的提示信息
+      message.success('上线接口成功');
+      // 重新加载数据
+      actionRef.current?.reload();
+      //返回 true 表示发布成功
+      return true;
+    } catch (error: any) {
+      hide();
+      // 否则提示'上线接口失败' + 报错信息
+      message.error('上线接口失败，' + error.message);
+      return false;
+    }
+  };
+  /**
+   *  下线接口
+   *
+   * @param selectedRows
+   */
+  const handleInterfaceOffline = async (record: API.InterfacesInfo) => {
+    // 设置加载中的提示为'正在删除'
+    const hide = message.loading('下线中...');
+    if (!record) return true; //如果接口数据为空，直接返回true
+    try {
+      // 修改为调用发布接口的Post请求方法
+      await offlineInterfaceInfoUsingPost({
+        // 传递接口的 id 参数
+        id: record.id
+      });
+      hide();
+      // 显示操作成功的提示信息
+      message.success('下线接口成功');
+      // 重新加载数据
+      actionRef.current?.reload();
+      //返回 true 表示发布成功
+      return true;
+    } catch (error: any) {
+      hide();
+      // 否则提示'上线接口失败' + 报错信息
+      message.error('下线接口失败，' + error.message);
       return false;
     }
   };
@@ -200,7 +262,8 @@ const TableList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
-        <a
+        <Button
+          type="text"
           key="config"
           onClick={() => {
             handleUpdateModalOpen(true);
@@ -208,15 +271,35 @@ const TableList: React.FC = () => {
           }}
         >
           修改
-        </a>,
-        <a
+        </Button>,
+        record.status === 0 ?
+          (<Button
+            type="text"
+            key="config"
+            onClick={() => {
+              handleInterfaceOnline(record);
+            }}>
+            发布
+          </Button>) : record.status === 1 ? (
+            <Button
+              type="text"
+              danger
+              key="config"
+              onClick={() => {
+                handleInterfaceOffline(record);
+              }}>
+              下线
+            </Button>
+          ) : null,
+        <Button
+          type="text"
+          danger
           key="config"
           onClick={() => {
             handleRemove(record);
-          }}
-        >
+          }}>
           删除
-        </a>,
+        </Button>,
       ],
     },
   ];
